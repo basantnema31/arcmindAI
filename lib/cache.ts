@@ -1,12 +1,16 @@
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-export function getCacheKey(keyword: string, userId: string, ...args: string[]): string {
-  return `${keyword}:${userId}:${args.join("/")}`
+export function getCacheKey(
+  keyword: string,
+  userId: string,
+  ...args: string[]
+): string {
+  return `${keyword}:${userId}:${args.join("/")}`;
 }
 
 export async function withCache<T>(

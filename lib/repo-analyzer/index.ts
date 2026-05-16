@@ -100,9 +100,15 @@ export class RepositoryAnalyzer {
             { headers: { Authorization: `Bearer ${this.token}` } },
           );
           return response.data;
-        }),
+        },
+      ),
       withCache(
-        getCacheKey("github:repo-languages", this.userId, this.owner, this.repo),
+        getCacheKey(
+          "github:repo-languages",
+          this.userId,
+          this.owner,
+          this.repo,
+        ),
         CACHE_TTL_SECONDS,
         async () => {
           const response = await axios.get(
@@ -110,7 +116,8 @@ export class RepositoryAnalyzer {
             { headers: { Authorization: `Bearer ${this.token}` } },
           );
           return response.data || {};
-        }),
+        },
+      ),
     ]);
 
     return {
@@ -133,15 +140,22 @@ export class RepositoryAnalyzer {
 
   private async fetchTree(branch: string): Promise<void> {
     const data = await withCache(
-      getCacheKey("github:repo-tree", this.userId, this.owner, this.repo, branch),
+      getCacheKey(
+        "github:repo-tree",
+        this.userId,
+        this.owner,
+        this.repo,
+        branch,
+      ),
       CACHE_TTL_SECONDS,
       async () => {
         const response = await axios.get(
           `https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${branch}?recursive=1`,
-          { headers: { Authorization: `Bearer ${this.token}` } }
+          { headers: { Authorization: `Bearer ${this.token}` } },
         );
         return response.data;
-    });
+      },
+    );
     this.tree = data.tree;
   }
 
@@ -173,7 +187,13 @@ export class RepositoryAnalyzer {
   private async fetchFileContent(path: string): Promise<void> {
     try {
       const data = await withCache<string>(
-        getCacheKey("github:file-content", this.userId, this.owner, this.repo, path),
+        getCacheKey(
+          "github:file-content",
+          this.userId,
+          this.owner,
+          this.repo,
+          path,
+        ),
         CACHE_TTL_SECONDS,
         async () => {
           const response = await axios.get(
@@ -185,9 +205,10 @@ export class RepositoryAnalyzer {
               },
               responseType: "text",
             },
-            );
+          );
           return response.data;
-        });
+        },
+      );
       this.fileContents.set(path, data);
     } catch (error) {
       console.error(`Failed to fetch ${path}:`, error);

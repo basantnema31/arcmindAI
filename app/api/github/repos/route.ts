@@ -44,11 +44,10 @@ export async function GET() {
 
     const data = await withCache(
       getCacheKey("github:repos", userId),
-      CACHE_TTL_SECONDS, async () => {
+      CACHE_TTL_SECONDS,
+      async () => {
         // Fetch user's repositories from GitHub
-      const response = await axios.get(
-        "https://api.github.com/user/repos",
-        {
+        const response = await axios.get("https://api.github.com/user/repos", {
           headers: {
             Authorization: `Bearer ${githubToken}`,
             Accept: "application/vnd.github.v3+json",
@@ -57,9 +56,10 @@ export async function GET() {
             sort: "updated",
             per_page: 100,
           },
-      });
-      return response.data;
-    });
+        });
+        return response.data;
+      },
+    );
 
     return NextResponse.json({
       success: true,
